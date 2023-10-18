@@ -1,3 +1,82 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Cohort:
+ *       type: object
+ *       required:
+ *         - cohortSlug
+ *         - cohortName
+ *         - programManager
+ *         - leadTeacher
+ *       properties:
+*         cohortSlug: 
+*           type: string
+*         cohortName: 
+*           type: string
+*         program: 
+*           type: string
+*         format: 
+*           type: string
+*         campus:
+*           type: string
+*         startDate: 
+*           type: string
+*           format: date
+*         endDate: 
+*           type: string
+*           format: date
+*         inProgress: 
+*           type: boolean
+*         programManager: 
+*           type: string
+*         leadTeacher: 
+*           type: string
+*         totalHours: 
+*           type: number
+ *       example:
+ *          _id: "616c4b4c649eaa001dd50f81"
+ *          inProgress: false
+ *          cohortSlug: "ft-wd-paris-2023-07-03"
+ *          cohortName: "FT WD PARIS 2023 07"
+ *          program: "Web Dev"
+ *          campus: "Paris"
+ *          startDate: "2023-07-03T00:00:00.000Z"
+ *          endDate: "2023-09-08T00:00:00.000Z"
+ *          programManager: "Sally Daher"
+ *          leadTeacher: "Florian Aube"
+ *          totalHours: 360
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Cohort
+ *   description: The cohorts managing API
+ * /api/cohorts:
+ *   post:
+ *     summary: Create a new cohort
+ *     tags: [Cohorts]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Cohort'
+ *     responses:
+ *       200:
+ *         description: The created cohort.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cohort'
+ *       500:
+ *         description: Some server error
+ *
+ */
+
+
+
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -19,6 +98,9 @@ mongoose
   .connect("mongodb://127.0.0.1:27017/cohort-tools-api")
   .then(x => console.log(`Connected to Database: "${x.connections[0].name}"`))
   .catch(err => console.error("Error connecting to MongoDB", err));
+
+
+  
 
 // STATIC DATA
 // Devs Team - Import the provided files with JSON data of students and cohorts here:
@@ -237,11 +319,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:5005",
       },
     ],
   },
-  apis: ["./models/*.js"],
+  apis: ["./app.js"],
 };
 
 const specs = swaggerJsdoc(options);
