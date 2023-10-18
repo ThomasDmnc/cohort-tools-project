@@ -13,7 +13,7 @@ const DEFAULT_STUDENT_FORM_VALUES = {
   languages: [],
   program: "",
   background: "",
-  image: "",
+  // image: "",
   cohort: "",
 };
 
