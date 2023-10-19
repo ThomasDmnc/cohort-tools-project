@@ -75,8 +75,7 @@
  *
  */
 
-
-
+const { errorHandler, notFoundHandler } = require("./middleware/errorhandler");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -140,7 +139,7 @@ app.get("/docs", (req, res) => {
 //   res.json(students);
 // });
 
-app.get("/api/students", (req, res) => {
+app.get("/api/students", (req, res, next) => {
   
   Student.find({})
   .populate('cohort')
@@ -149,8 +148,9 @@ app.get("/api/students", (req, res) => {
       res.json(students);
     })
     .catch((error) => {
-      console.error("Error while retrieving students ->", error);
-      res.status(500).send({ error: "Failed to retrieve students" });
+      next(error);
+      /* console.error("Error while retrieving students ->", error);
+      res.status(500).send({ error: "Failed to retrieve students" }); */
     });
 });
 
@@ -161,7 +161,8 @@ app.post('/api/students', (req, res, next) => {
   ).then(createdStudent => {
     res.status(201).json(createdStudent)
   }).catch((error) =>{
-    res.status(500).json({message: 'Error while creating a Student'})
+    next(error);
+    /* res.status(500).json({message: 'Error while creating a Student'}) */
   })
 })
 
@@ -178,13 +179,14 @@ app.get('/api/students/:studentId', (req, res, next) => {
   .then( (foundStudent) => {
     res.status(201).json(foundStudent)
   }).catch((error) =>{
-    res.status(500).json({message: `Cannot find the student`})
+    next(error);
+    /* res.status(500).json({message: `Cannot find the student`}) */
   })
 
 })
 
 
-app.get('/api/students/cohort/:cohortId', (req, res) => {
+app.get('/api/students/cohort/:cohortId', (req, res, next) => {
     const { cohortId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(cohortId)){
@@ -196,11 +198,12 @@ app.get('/api/students/cohort/:cohortId', (req, res) => {
     .then((foundStudents) => {
       res.status(200).json(foundStudents)
     }).catch( (error) => {
-      res.status(500).json({message: `Cannot find the students from this cohortid.`})
+      next(error);
+      /* res.status(500).json({message: `Cannot find the students from this cohortid.`}) */
     })
 })
 
-app.put('/api/students/:studentId', (req, res) =>{
+app.put('/api/students/:studentId', (req, res, next) =>{
   const { studentId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(studentId)){
@@ -211,13 +214,14 @@ app.put('/api/students/:studentId', (req, res) =>{
   .then((updatedStudent) => {
     res.status(200).json(updatedStudent)
   }).catch((error) =>{
-    res.status(500).json({message: `Update went wrong, ooops.`})
+    next(error);
+    /* res.status(500).json({message: `Update went wrong, ooops.`}) */
   })
 
 })
 
 // delete specific student
-app.delete('/api/students/:studentId', (req, res) => {
+app.delete('/api/students/:studentId', (req, res, next) => {
   const { studentId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(studentId)){
@@ -228,27 +232,29 @@ app.delete('/api/students/:studentId', (req, res) => {
   .then(() =>{
     res.status(201).json({message: `Student with ${studentId} has beeen deleted successfully`})
   }).catch(() =>{
-    res.status(500).json({message: `Oops, nonono working.`})
+    next(error);
+    /* res.status(500).json({message: `Oops, nonono working.`}) */
   })
 })
 
 
 
-app.get("/api/cohorts", (req, res) => {
-  Cohort.find({})
+app.get("/api/cohorts", (req, res, next) => {
+  Cohort.find(req.query)
     .then((cohorts) => {
       console.log(cohorts);
       res.json(cohorts);
     })
     .catch((error) => {
-      console.error("Error while retrieving cohorts ->", error);
-      res.status(500).send({ error: "Failed to retrieve cohorts" });
+      next(error);
+      /* console.error("Error while retrieving cohorts ->", error);
+      res.status(500).send({ error: "Failed to retrieve cohorts" }); */
     });
 });
 
 
 
-app.get("/api/cohorts/:cohortId", async (req, res) => {
+app.get("/api/cohorts/:cohortId", async (req, res, next) => {
   const { cohortId } = req.params;
   try {
     const cohort = await Cohort.findById(cohortId);
@@ -258,24 +264,26 @@ app.get("/api/cohorts/:cohortId", async (req, res) => {
       res.status(200).json(cohort);
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
+    /* console.error(error);
+    res.status(500).json({ error: "Internal Server Error" }); */
   }
 });
 
 
-app.post("/api/cohorts", async (req, res) => {
+app.post("/api/cohorts", async (req, res, next) => {
   try {
     const newCohort = await Cohort.create(req.body);
     res.status(201).json({ cohort: newCohort });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
+    /* console.error(error);
+    res.status(500).json({ error: "Internal Server Error" }); */
   }
 });
 
 
-app.put("/api/cohorts/:cohortId", async (req, res) => {
+app.put("/api/cohorts/:cohortId", async (req, res, next) => {
   const { cohortId } = req.params;
   try {
     const updatedCohort = await Cohort.findByIdAndUpdate(cohortId, req.body, { new: true });
@@ -285,8 +293,9 @@ app.put("/api/cohorts/:cohortId", async (req, res) => {
       res.status(200).json({ cohort: updatedCohort });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
+    /* console.error(error);
+    res.status(500).json({ error: "Internal Server Error" }); */
   }
 });
 
@@ -333,6 +342,8 @@ app.use(
   swaggerUi.setup(specs, { explorer: true })
 );
 
+app.use(errorHandler)
+app.use(notFoundHandler)
 
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
