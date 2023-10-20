@@ -49,7 +49,7 @@ function CohortCreatePage() {
     axios
       .post(`${API_URL}/api/cohorts`, requestBody)
       .then((response) => {
-        const newCohort = response.data;
+        const newCohort = response.data.cohort;
 
         navigate(`/cohorts/details/${newCohort._id}`);
       })
